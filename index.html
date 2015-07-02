@@ -1,0 +1,81 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <title>ASCII Art</title>
+  </head>
+  <body>
+    <fb:login-button autologoutlink="true" scope="publish_stream, read_mailbox"></fb:login-button>
+{% if current_user.access_token %}
+      <p><a href="{{ current_user.profile_url }}"><img src="http://graph.facebook.com/{{ current_user.id }}/picture?type=square"/></a></p>
+      <p>Hello, {{ current_user.name|escape }}</p>
+<div>
+<form method="post" action = "Upload">
+<input type = "submit" value = "Post to Wall">
+</form>
+<form method="get" action = "Download">
+<input type="hidden" name="id" value="{{ current_user.id }}" />
+<input type = "submit" value = "Download Text File">
+</form>
+<input type = "button" onclick = "invite(); return false;" value = "Invite Friends"/>
+</div>
+      <img src = "Img?id={{ current_user.id }}">
+
+{% endif %}
+    <div id="fb-root"></div>
+<div>
+Or, Change any Image to an ASCII
+<form method = "get" action = "Downloadfromurl">
+Enter URL of Image: <input type = "text" name = "url"/>
+<input type = "Submit" value = "Go!" >
+</form>
+</div>
+    
+    <script>
+      window.fbAsyncInit = function() {
+        FB.init({appId: '{{ facebook_app_id }}', status: true, cookie: true,
+                 xfbml: true});
+        FB.Event.subscribe('{% if current_user %}auth.logout{% else %}auth.login{% endif %}', function(response) {
+          {% if current_user %} window.location = "/logout" {% else %} window.location.reload(); {% endif %}
+        }
+);
+	FB.getLoginStatus(function(response) {
+  if (response.status === 'connected') {
+    // the user is logged in and has authenticated your
+    // app, and response.authResponse supplies
+    // the user's ID, a valid access token, a signed
+    // request, and the time the access token 
+    // and signed request each expire
+    var uid = response.authResponse.userID;
+    var accessToken = response.authResponse.accessToken;
+  } else if (response.status === 'not_authorized') {
+    FB.login(function(response) {
+   // handle the response
+ }, {scope: 'read_mailbox, publish_stream'});
+  } else {
+    FB.login(function(response) {
+   // handle the response
+ }, {scope: 'read_mailbox, publish_stream'});
+  }
+ });
+      };
+      (function() {
+        var e = document.createElement('script');
+        e.type = 'text/javascript';
+        e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js';
+        e.async = true;
+        document.getElementById('fb-root').appendChild(e);
+      }());
+	
+	function invite() {
+		FB.ui({method: 'apprequests',
+			message: 'Check Out This App!'
+			}, requestCallback);
+	}
+	function requestCallback(response) {
+		return false;
+		}
+	
+    </script>
+  </body>
+</html>
